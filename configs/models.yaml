@@ -1,0 +1,31 @@
+# Model / experiment definitions.
+# Each experiment: arch (registry key), params (constructor kwargs), optional training overrides.
+common_params: {hidden: 64, heads: 4, dropout: 0.2}
+
+experiments:
+  # ---------------- proposed model
+  tracex:        {arch: tracex, group: main}
+
+  # ---------------- baselines
+  lstm:          {arch: lstm, group: baseline}
+  gru:           {arch: gru, group: baseline}
+  gcn:           {arch: gcn, group: baseline}
+  graphsage:     {arch: graphsage, group: baseline}
+  gat:           {arch: gat, group: baseline}
+  gat_lstm:      {arch: gat_lstm, group: baseline}
+
+  # ---------------- ablations (one change at a time w.r.t. tracex)
+  abl_sequence_only:   {arch: tracex, group: ablation, params: {use_graph: false, use_temporal: false}}
+  abl_graph_only:      {arch: tracex, group: ablation, params: {use_sender: false, use_receiver: false, use_temporal: false}}
+  abl_no_temporal_enc: {arch: tracex, group: ablation, params: {time_encoding: none}}
+  abl_no_edge_feats:   {arch: tracex, group: ablation, params: {graph_edge_features: false}}
+  abl_mean_aggr:       {arch: tracex, group: ablation, params: {graph_attention: false}}
+  abl_no_sender:       {arch: tracex, group: ablation, params: {use_sender: false}}
+  abl_no_receiver:     {arch: tracex, group: ablation, params: {use_receiver: false}}
+  abl_concat_fusion:   {arch: tracex, group: ablation, params: {fusion: concat}}
+  abl_seq5:            {arch: tracex, group: ablation, training: {seq_len: 5}}
+  abl_seq20:           {arch: tracex, group: ablation, training: {seq_len: 20}}
+  # (abl seq_len=10 is the full tracex model)
+
+  # ---------------- optional loss experiment
+  tracex_focal:  {arch: tracex, group: extra, training: {loss: {type: focal, alpha: 0.25, gamma: 2.0}}}

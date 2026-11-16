@@ -1,0 +1,30 @@
+# Shared training configuration (individual experiments may override in models.yaml).
+seeds: [0, 1, 2]
+device: auto            # auto -> cuda if available else cpu
+num_threads: 8
+amp: auto               # mixed precision only when CUDA is available (no CPU bf16 speed-up on this hardware)
+
+batch_size: 1024
+eval_batch_size: 4096
+max_epochs: 12
+patience: 3             # early stopping on validation PR-AUC (val_select)
+lr: 0.001
+weight_decay: 0.0001
+grad_clip: 1.0
+scheduler: {type: plateau, factor: 0.5, patience: 1}
+
+# Each epoch uses ALL training positives + a fresh uniform sample of training negatives.
+neg_per_epoch: 150000
+loss: {type: bce, pos_weight: auto}   # auto = n_neg/n_pos of the epoch sample; focal: {type: focal, alpha: 0.25, gamma: 2}
+
+# Inputs
+seq_len: 10             # history length used by sequence branches (stored up to 20)
+k1: 10                  # hop-1 temporal neighbours per endpoint
+k2: 5                   # hop-2 temporal neighbours per hop-1 neighbour
+
+# Validation evaluation: all positives + a fixed uniform sample of negatives,
+# negatives re-weighted by 1/sampling-rate (unbiased full-split estimates).
+eval_subsample_neg: 100000
+eval_subsample_seed: 12345
+
+mlflow: true

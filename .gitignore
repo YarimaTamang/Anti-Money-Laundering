@@ -1,0 +1,24 @@
+# data & large artefacts
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+checkpoints/
+experiments/**/preds_*.npy
+experiments/**/preds_*.npz
+experiments/**/*.npy
+experiments/**/*.npz
+experiments/dev/
+experiments/*.out
+mlflow.db
+mlruns/
+# python
+__pycache__/
+*.pyc
+.pytest_cache/
+.ipynb_checkpoints/
+# secrets
+.env
+kaggle.json
+# scratch
+scripts/_*.py

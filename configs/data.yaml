@@ -1,0 +1,32 @@
+# Data configuration for TRACE-X.
+# Paths are relative to the project root unless absolute.
+dataset:
+  kaggle_handle: ealtman2019/ibm-transactions-for-anti-money-laundering-aml
+  transactions_file: HI-Small_Trans.csv
+  patterns_file: HI-Small_Patterns.txt
+  # Manual download: place the two files above in raw_dir (or set TRACEX_RAW_FILE).
+  raw_dir: data/raw
+
+# Root for cached preprocessing artefacts; a sub-folder per mode is created.
+# Can be overridden with the TRACEX_DATA_DIR environment variable.
+processed_dir: data/processed
+
+# "dev" = earliest `dev.n_rows` transactions (chronological prefix), "full" = everything.
+mode: full
+dev:
+  n_rows: 600000
+
+split:
+  # Chronological split by transaction count; boundaries snapped to timestamp changes
+  # so that no timestamp straddles two splits.
+  train: 0.6
+  val: 0.2
+  test: 0.2
+  # The validation block is further split chronologically:
+  #   val_select (first half)  -> early stopping, model selection, threshold selection
+  #   val_cal    (second half) -> probability calibration + conformal calibration
+  val_select_fraction: 0.5
+
+history:
+  max_seq_len: 20        # stored history length; models may use the last 5/10/20
+  max_neighbors: 10      # stored temporal neighbours per (transaction, endpoint)

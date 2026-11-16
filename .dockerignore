@@ -1,0 +1,8 @@
+data/
+checkpoints/
+experiments/
+mlflow.db
+mlruns/
+.git/
+**/__pycache__/
+.env
