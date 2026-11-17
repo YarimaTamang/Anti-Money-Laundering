@@ -123,22 +123,22 @@ def explain(view: TabularView, eid: int, bg: np.ndarray, nsamples: int = 400, se
 
 def feature_fidelity(view: TabularView, eid: int, shap_vals: np.ndarray, bg: np.ndarray, k: int = 5,
                      n_random: int = 20, seed: int = 0) -> dict:
-    """Replace top-k |SHAP| features (in the direction supporting the prediction) by the background
-    median vs. random-k features; report the change in probability."""
+    """Replace the top-k SHAP features supporting the prediction by the background median vs.
+    random-k features; reports the logit drop in the direction of the predicted class."""
     f = make_predict_fn(view, eid)
     x = view.features(np.array([eid]))[0]
-    p = lambda z: 1 / (1 + np.exp(-f(z[None])[0]))  # noqa: E731
-    p0 = p(x)
+    lg = lambda z: float(f(z[None])[0])  # noqa: E731
+    l0 = lg(x)
     ref = np.median(bg, 0)
-    sign = 1.0 if p0 >= 0.5 else -1.0
+    sign = 1.0 if l0 >= 0 else -1.0
     top = np.argsort(-sign * shap_vals)[:k]
 
-    def replaced(idx):
+    def drop(idx):
         z = x.copy(); z[idx] = ref[idx]
-        return p(z)
+        return sign * (l0 - lg(z))
 
     rng = np.random.default_rng(seed)
-    rand = [p0 - replaced(rng.choice(len(x), k, replace=False)) for _ in range(n_random)]
+    rand = [drop(rng.choice(len(x), k, replace=False)) for _ in range(n_random)]
     a = np.abs(shap_vals)
-    return {"p": float(p0), "k": k, "drop_topk": float(p0 - replaced(top)), "drop_random_k": float(np.mean(rand)),
-            "sparsity_top5_mass": float(np.sort(a)[::-1][:5].sum() / max(a.sum(), 1e-12))}
+    return {"logit": l0, "k": k, "drop_topk": float(drop(top)), "drop_random_k": float(np.mean(rand)),
+            "sparsity_top5_mass": float(np.sort(a)[::-1][:5].sum() / max(a.sum(), 1e-12))}  # noqa: E501

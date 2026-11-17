@@ -64,4 +64,4 @@ network.legend()
 with st.expander("Transactions in view"):
     view = df.iloc[eids][["tx_id", "timestamp", "payment_format", "usd_paid", "label"]].copy()
     view["sender"] = acc[s.a["src"][eids]]; view["receiver"] = acc[s.a["dst"][eids]]; view["score"] = pl[eids]
-    st.dataframe(view, hide_index=True, use_container_width=True)
+    st.dataframe(view, hide_index=True, width="stretch")

@@ -6,7 +6,7 @@ amp: auto               # mixed precision only when CUDA is available (no CPU bf
 
 batch_size: 1024
 eval_batch_size: 4096
-max_epochs: 12
+max_epochs: 20
 patience: 3             # early stopping on validation PR-AUC (val_select)
 lr: 0.001
 weight_decay: 0.0001
@@ -24,7 +24,7 @@ k2: 5                   # hop-2 temporal neighbours per hop-1 neighbour
 
 # Validation evaluation: all positives + a fixed uniform sample of negatives,
 # negatives re-weighted by 1/sampling-rate (unbiased full-split estimates).
-eval_subsample_neg: 100000
+eval_subsample_neg: 50000
 eval_subsample_seed: 12345
 
 mlflow: true

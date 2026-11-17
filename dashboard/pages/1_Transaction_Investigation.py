@@ -65,9 +65,9 @@ for col, side, title, acct in ((c1, 0, "Sender", int(row.src)), (c2, 1, "Receive
             st.dataframe(pd.DataFrame({
                 "metric": ["outgoing tx", "incoming tx", "distinct receivers", "distinct senders", "out volume (USD)", "in volume (USD)",
                            "mean outgoing (USD)", "minutes since last activity"],
-                "value": [p["outgoing_count"], p["incoming_count"], p["unique_receivers"], p["unique_senders"],
-                          f"{p['outgoing_volume_usd']:,.0f}", f"{p['incoming_volume_usd']:,.0f}", f"{p['mean_outgoing_usd']:,.0f}",
-                          p["minutes_since_last_activity"]]}), hide_index=True, use_container_width=True)
+                "value": [f"{p['outgoing_count']:,}", f"{p['incoming_count']:,}", f"{p['unique_receivers']:,}", f"{p['unique_senders']:,}",
+                          f"${p['outgoing_volume_usd']:,.0f}", f"${p['incoming_volume_usd']:,.0f}", f"${p['mean_outgoing_usd']:,.0f}",
+                          f"{p['minutes_since_last_activity']:,}"]}), hide_index=True, width="stretch")
         else:
             st.info("No earlier activity for this account in the dataset.")
 
@@ -93,12 +93,12 @@ for tab, key, cp_col in ((tabs[0], "seq_s_eid", "dst"), (tabs[1], "seq_r_eid", "
         fig.add_scatter(x=[0], y=[row.usd_paid], mode="markers", marker=dict(size=13, color=ORANGE, symbol="diamond"), name="target")
         fig.update_layout(height=280, yaxis_type="log", xaxis_title="minutes relative to target", yaxis_title="USD (log)", showlegend=False,
                           title="History (left) and target transaction (orange)")
-        st.plotly_chart(fig, use_container_width=True)
-        st.dataframe(hist, hide_index=True, use_container_width=True, column_config={"amount (USD)": st.column_config.NumberColumn(format="$%.2f")})
+        st.plotly_chart(fig, width="stretch")
+        st.dataframe(hist, hide_index=True, width="stretch", column_config={"amount (USD)": st.column_config.NumberColumn(format="$%.2f")})
 
 st.subheader("Explanations")
 ig, src_ig = explain_live.get(eid, "ig")
-st.plotly_chart(explain_live.ig_bars(ig), use_container_width=True)
+st.plotly_chart(explain_live.ig_bars(ig), width="stretch")
 st.caption(f"Integrated Gradients ({src_ig}). Orange bars push the score towards suspicious.")
 g, src_g = explain_live.get(eid, "gnn")
 cA, cB = st.columns([1.3, 1])
@@ -116,10 +116,10 @@ with cB:
     ef = pd.Series(g["edge_feature_importance"]).sort_values(ascending=False).head(10)[::-1]
     fig = go.Figure(go.Bar(x=ef.values, y=ef.index, orientation="h", marker_color=AQUA))
     fig.update_layout(title=f"GNNExplainer edge-feature mask ({src_g})", height=420, xaxis_range=[0, 1])
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 sh, src_sh = explain_live.get(eid, "shap", allow_compute=False)
 if sh is None and st.button("Compute Kernel SHAP for this transaction"):
     sh, src_sh = explain_live.get(eid, "shap")
 if sh is not None:
-    st.plotly_chart(explain_live.shap_bar(sh), use_container_width=True)
+    st.plotly_chart(explain_live.shap_bar(sh), width="stretch")
     st.caption(f"Kernel SHAP ({src_sh}); history and neighbourhood held fixed. Attention weights are not used as explanations.")

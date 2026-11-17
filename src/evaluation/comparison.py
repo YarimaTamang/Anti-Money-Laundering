@@ -53,7 +53,12 @@ def collect(mode: str) -> pd.DataFrame:
     rows = []
     for f in sorted((PROJECT_ROOT / "experiments" / mode).glob("*/seed*/metrics.json")):
         m = json.load(open(f))
-        rows.append({"exp": m["exp"], "seed": m["seed"], **flatten(m)})
+        row = {"exp": m["exp"], "seed": m["seed"], **flatten(m)}
+        if (f.parent / "TIMING_INVALID.txt").exists():  # wall-clock disturbed (e.g. system sleep)
+            for k in ("train_min", "infer_tx_per_s", "latency_ms"):
+                row[k] = np.nan
+            row["timing_invalid"] = True
+        rows.append(row)
     return pd.DataFrame(rows)
 
 

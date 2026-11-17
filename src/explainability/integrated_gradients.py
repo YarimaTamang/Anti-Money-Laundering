@@ -64,28 +64,29 @@ def explain(ex: Explainable, eid: int, n_steps: int = 64) -> dict:
 
 @torch.no_grad()
 def step_fidelity(ex: Explainable, eid: int, ig: dict, k: int = 3, n_random: int = 20, seed: int = 0) -> dict:
-    """Delete (set to baseline) the top-k attributed history steps vs. random-k steps; change in probability."""
+    """Delete (set to baseline) the top-k attributed history steps vs. random-k steps;
+    reports the drop of the logit in the direction of the predicted class."""
     b = ex.batch(eid)
-    p0 = float(ex.prob(b)[0])
+    l0 = float(ex.model(b)[0])
     steps = [("s", r["position"], r["attribution"]) for r in ig["sender_steps"]] + \
             [("r", r["position"], r["attribution"]) for r in ig["receiver_steps"]]
     if not steps:
-        return {"p": p0, "n_steps": 0}
+        return {"logit": l0, "n_steps": 0}
     k = min(k, len(steps))
-    sign = 1.0 if p0 >= 0.5 else -1.0  # evidence for the predicted class
+    sign = 1.0 if l0 >= 0 else -1.0  # evidence for the predicted class
     order = sorted(range(len(steps)), key=lambda i: -sign * steps[i][2])
 
-    def p_without(idx):
+    def drop(idx):
         bb = dict(b)
         bb["seq_s"], bb["seq_r"] = b["seq_s"].clone(), b["seq_r"].clone()
         for i in idx:
             which, pos, _ = steps[i]
             bb["seq_" + which][0, pos] = 0.0
-        return float(ex.prob(bb)[0])
+        return sign * (l0 - float(ex.model(bb)[0]))
 
     rng = np.random.default_rng(seed)
-    rand = [p0 - p_without(rng.choice(len(steps), k, replace=False)) for _ in range(n_random)]
+    rand = [drop(rng.choice(len(steps), k, replace=False)) for _ in range(n_random)]
     att = np.abs([s[2] for s in steps])
-    return {"p": p0, "n_steps": len(steps), "k": k, "drop_topk": p0 - p_without(order[:k]),
+    return {"logit": l0, "n_steps": len(steps), "k": k, "drop_topk": drop(order[:k]),
             "drop_random_k": float(np.mean(rand)),
             "sparsity_top3_mass": float(np.sort(att)[::-1][:3].sum() / max(att.sum(), 1e-12))}

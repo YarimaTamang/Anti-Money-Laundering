@@ -34,10 +34,17 @@ def class_quantile(scores: np.ndarray, alpha: float) -> float:
 
 
 class MondrianConformal:
-    def fit(self, p_cal: np.ndarray, y_cal: np.ndarray, alpha: float = 0.1):
+    """Class-specific error levels: alpha_normal bounds the share of NORMAL transactions whose
+    prediction set excludes "normal" (they become alerts or reviews); alpha bounds the share of
+    LAUNDERING transactions whose set excludes "suspicious". With 0.1% prevalence a single
+    alpha=0.1 would push ~10% of all normal traffic out of the normal set, so the default policy
+    is alpha_normal=0.01, alpha=0.1 (fixed a priori, never tuned on test labels)."""
+
+    def fit(self, p_cal: np.ndarray, y_cal: np.ndarray, alpha: float = 0.1, alpha_normal: float | None = None):
         self.alpha = alpha
-        self.q0 = class_quantile(p_cal[y_cal == 0], alpha)          # score for y=0 is p
-        self.q1 = class_quantile(1 - p_cal[y_cal == 1], alpha)      # score for y=1 is 1-p
+        self.alpha_normal = alpha if alpha_normal is None else alpha_normal
+        self.q0 = class_quantile(p_cal[y_cal == 0], self.alpha_normal)  # score for y=0 is p
+        self.q1 = class_quantile(1 - p_cal[y_cal == 1], alpha)          # score for y=1 is 1-p
         # include 0 iff p <= q0 ; include 1 iff p >= 1 - q1
         self.t_normal, self.t_suspicious = self.q0, 1 - self.q1
         return self
@@ -63,7 +70,8 @@ class MondrianConformal:
         fn = (w * (ret & ~pred & (y == 1))).sum()
         W = w.sum()
         return {
-            "alpha": self.alpha, "t_normal": self.t_normal, "t_suspicious": self.t_suspicious,
+            "alpha_laundering": self.alpha, "alpha_normal": self.alpha_normal,
+            "t_normal": self.t_normal, "t_suspicious": self.t_suspicious,
             "coverage_overall": float((w * covered).sum() / W),
             "coverage_class0": float((w * covered * (y == 0)).sum() / max((w * (y == 0)).sum(), 1e-12)),
             "coverage_class1": float((w * covered * (y == 1)).sum() / max((w * (y == 1)).sum(), 1e-12)),

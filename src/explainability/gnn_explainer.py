@@ -100,18 +100,23 @@ def explain(ex: Explainable, eid: int, epochs: int = 200, lr: float = 0.01, seed
 
 @torch.no_grad()
 def edge_fidelity(ex: Explainable, eid: int, edge_mask: np.ndarray, k: int = 5, n_random: int = 20, seed: int = 0) -> dict:
-    """Fidelity+ (remove top-k edges) and fidelity- (keep only top-k) vs. random-k baselines."""
+    """Fidelity+ (remove top-k edges) and fidelity- (keep only top-k) vs. random-k baselines.
+
+    Measured as the change of the LOGIT in the direction of the predicted class
+    (sigmoid probabilities saturate near 0/1 and hide real changes)."""
     b = ex.batch(eid)
     E = len(edge_mask)
-    p0 = float(ex.prob(b)[0])
+    l0 = float(ex.model(b)[0])
+    sign = 1.0 if l0 >= 0 else -1.0
     if E == 0:
-        return {"p": p0, "E": 0}
+        return {"logit": l0, "E": 0}
     k = min(k, E)
     top = np.argsort(-edge_mask)[:k]
 
-    def p_with(keep: np.ndarray) -> float:
-        return float(ex.prob(b, emask=torch.from_numpy(keep.astype(np.float32)))[0])
+    def l_with(keep: np.ndarray) -> float:
+        return float(ex.model(b, emask=torch.from_numpy(keep.astype(np.float32)))[0])
 
+    drop = lambda keep: sign * (l0 - l_with(keep))  # noqa: E731
     rm = np.ones(E); rm[top] = 0
     only = np.zeros(E); only[top] = 1
     rng = np.random.default_rng(seed)
@@ -120,11 +125,11 @@ def edge_fidelity(ex: Explainable, eid: int, edge_mask: np.ndarray, k: int = 5, 
         r = rng.choice(E, k, replace=False)
         a = np.ones(E); a[r] = 0
         o = np.zeros(E); o[r] = 1
-        rand_rm.append(p0 - p_with(a)); rand_only.append(p0 - p_with(o))
+        rand_rm.append(drop(a)); rand_only.append(drop(o))
     return {
-        "p": p0, "E": int(E), "k": int(k),
-        "fid_plus": p0 - p_with(rm), "fid_plus_random": float(np.mean(rand_rm)),
-        "fid_minus": p0 - p_with(only), "fid_minus_random": float(np.mean(rand_only)),
-        "p_without_graph": p_with(np.zeros(E)),
+        "logit": l0, "E": int(E), "k": int(k),
+        "fid_plus": drop(rm), "fid_plus_random": float(np.mean(rand_rm)),
+        "fid_minus": drop(only), "fid_minus_random": float(np.mean(rand_only)),
+        "fid_no_graph": drop(np.zeros(E)),
         "sparsity_frac_mask_gt_0.5": float((edge_mask > 0.5).mean()),
     }

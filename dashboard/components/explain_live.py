@@ -68,7 +68,7 @@ def ig_bars(r: dict) -> go.Figure:
                     customdata=[[s["tx_id"], ", ".join(f"{n} {v:+.2f}" for n, v in s["top_features"])] for s in st_],
                     hovertemplate="tx %{customdata[0]}<br>attribution %{y:+.3f}<br>%{customdata[1]}<extra></extra>",
                     row=1, col=col, showlegend=False)
-    fig.update_layout(title=f"Integrated Gradients (oldest → newest; completeness Δ={r['completeness_delta']:.1e})", height=360)
+    fig.update_layout(title=f"Integrated Gradients (oldest → newest; completeness Δ={r['completeness_delta']:.1e})", height=380, margin=dict(t=95))
     return fig
 
 

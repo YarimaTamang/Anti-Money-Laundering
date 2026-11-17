@@ -93,7 +93,7 @@ def plot_ig(ig: dict, path):
         ax.set_xticks(range(len(v))); ax.set_xticklabels(x, rotation=60, fontsize=6)
         ax.axhline(0, color="#8a8984", lw=0.8); ax.set_title(title)
     axes[0].set_ylabel("IG attribution (logit)")
-    fig.suptitle(f"Integrated Gradients — tx {ig['tx_id']} (oldest → newest; orange = pushes towards suspicious)", fontsize=9)
+    fig.suptitle(f"Integrated Gradients — tx {ig['tx_id']} (oldest → newest; orange = pushes towards suspicious)", fontsize=9, y=1.06)
     save(fig, path)
 
 
@@ -116,7 +116,11 @@ def main():
     ap.add_argument("--shap-nsamples", type=int, default=400)
     ap.add_argument("--stability-seeds", default="1,2")
     ap.add_argument("--n-stability", type=int, default=4)
+    ap.add_argument("--threads", type=int, default=2)
     a = ap.parse_args()
+    import torch
+
+    torch.set_num_threads(a.threads)
     apply_style()
     (OUT / "cases").mkdir(parents=True, exist_ok=True)
     (OUT / "figures").mkdir(parents=True, exist_ok=True)

@@ -64,6 +64,8 @@ def render(edges: list[dict], highlight: set[int] = frozenset(), height: int = 5
                      arrows="to", smooth={"type": "curvedCW", "roundness": 0.15})
     net.set_options('{"interaction": {"hover": true, "tooltipDelay": 80}, "physics": {"stabilization": {"iterations": 150}}}')
     html = net.generate_html(notebook=False)
+    html = (html.replace("border: 1px solid lightgray;", "border: none;")
+                .replace("<body>", f"<body style='margin:0;background:{PANEL}'>", 1))
     components.html(html, height=height + 20, scrolling=False)
 
 

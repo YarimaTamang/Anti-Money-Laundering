@@ -39,7 +39,9 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--exp", default="tracex"); ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--mode", default="full"); ap.add_argument("--T", type=int, default=20)
-    ap.add_argument("--alpha", type=float, default=0.1)
+    ap.add_argument("--alpha", type=float, default=0.1, help="alpha for the laundering class")
+    ap.add_argument("--alpha-normal", type=float, default=0.01, help="alpha for the normal class")
+    ap.add_argument("--recompute-mc", action="store_true")
     a = ap.parse_args()
     apply_style()
     out = PROJECT_ROOT / "reports" / "uncertainty"; (out / "figures").mkdir(parents=True, exist_ok=True)
@@ -53,24 +55,34 @@ def main():
     te = store.split_eids(SPLIT_TEST)
     p_te, y_te = sigmoid(np.load(exp_dir / "preds_test.npy")), y_all[te]
 
-    res = {"conformal": {}, "notes": "conformal calibrated on val_cal; evaluated on full test split"}
-    for alpha in (0.05, 0.1, 0.2):
-        cp = MondrianConformal().fit(p_cal, y_cal, alpha)
-        res["conformal"][str(alpha)] = cp.report(p_te, y_te)
-    cp = MondrianConformal().fit(p_cal, y_cal, a.alpha)
+    res = {"conformal": {}, "notes": "class-conditional conformal calibrated on val_cal; evaluated on the full test split; "
+                                      "alpha values are a priori policy choices, not tuned on test labels"}
+    grid = [(0.1, 0.1), (0.05, 0.05), (0.02, 0.1), (0.01, 0.1), (0.01, 0.05), (0.005, 0.1)]
+    for an, al in grid:
+        cp = MondrianConformal().fit(p_cal, y_cal, alpha=al, alpha_normal=an)
+        res["conformal"][f"{an}/{al}"] = cp.report(p_te, y_te)
+    cp = MondrianConformal().fit(p_cal, y_cal, alpha=a.alpha, alpha_normal=a.alpha_normal)
     np.save(exp_dir / "conformal_test_outcome.npy", cp.outcome(p_te))
-    json.dump({"alpha": a.alpha, "t_normal": cp.t_normal, "t_suspicious": cp.t_suspicious},
-              open(exp_dir / "conformal.json", "w"), indent=1)
+    json.dump({"alpha_laundering": a.alpha, "alpha_normal": a.alpha_normal, "t_normal": cp.t_normal,
+               "t_suspicious": cp.t_suspicious}, open(exp_dir / "conformal.json", "w"), indent=1)
 
-    # ---------------- MC dropout
-    vc_e = vc["eids"]
-    mu_c, sd_c = mc_predict(model, store, vc_e, cfg, T=a.T)
+    # ---------------- MC dropout (reuses saved stochastic passes unless --recompute-mc)
+    saved = exp_dir / "mc_dropout_test_subsample.npz"
+    old = out / "uncertainty.json"
     ts_e, ts_w = eval_subset(store, SPLIT_TEST, cfg["eval_subsample_neg"], cfg["eval_subsample_seed"])
-    mu_t, sd_t = mc_predict(model, store, ts_e, cfg, T=a.T)
+    if saved.exists() and old.exists() and not a.recompute_mc and "mc_dropout" in json.load(open(old)):
+        z = np.load(saved)
+        assert np.array_equal(z["eids"], ts_e)
+        mu_t, sd_t = z["mean"], z["std"]
+        sd_thr = json.load(open(old))["mc_dropout"]["std_threshold_val_cal_q95"]
+    else:
+        mu_c, sd_c = mc_predict(model, store, vc["eids"], cfg, T=a.T)
+        np.savez(exp_dir / "mc_dropout_val_cal.npz", eids=vc["eids"], mean=mu_c, std=sd_c)
+        mu_t, sd_t = mc_predict(model, store, ts_e, cfg, T=a.T)
+        sd_thr = float(np.quantile(sd_c, 0.95))
     y_t = y_all[ts_e].astype(float)
     thr = json.load(open(exp_dir / "metrics.json"))["test"]["threshold"]
     err = ((mu_t >= thr) != (y_t == 1)).astype(int)
-    sd_thr = float(np.quantile(sd_c, 0.95))
     review = sd_t > sd_thr
     keep = ~review
     pred = mu_t >= thr
@@ -101,7 +113,7 @@ def main():
     axes[0].hist(sd_t[y_t == 1], bins=bins, density=True, histtype="step", lw=2, color=SUSPICIOUS, label="laundering")
     axes[0].axvline(sd_thr, color="#52514e", ls="--", lw=1); axes[0].set_yscale("log")
     axes[0].set_xlabel("MC-dropout std of p(suspicious)"); axes[0].set_title("Uncertainty distribution (test)"); axes[0].legend()
-    al = sorted(res["conformal"])
+    al = list(res["conformal"])
     cov1 = [res["conformal"][k]["coverage_class1"] for k in al]
     cov0 = [res["conformal"][k]["coverage_class0"] for k in al]
     abst = [res["conformal"][k]["abstention_rate"] for k in al]
@@ -109,23 +121,26 @@ def main():
     axes[1].bar(x - 0.25, cov0, 0.25, color=NORMAL, label="coverage (normal)")
     axes[1].bar(x, cov1, 0.25, color=SUSPICIOUS, label="coverage (laundering)")
     axes[1].bar(x + 0.25, abst, 0.25, color=SERIES[2], label="routed to human review")
-    for i, k in enumerate(al):
-        axes[1].axhline(1 - float(k), xmin=(i) / len(al), xmax=(i + 1) / len(al), color="#52514e", ls=":", lw=1)
-    axes[1].set_xticks(x); axes[1].set_xticklabels([f"α={k}" for k in al]); axes[1].set_ylim(0, 1.05)
-    axes[1].set_title("Class-conditional conformal (test)"); axes[1].legend(fontsize=7, loc="lower right")
+    axes[1].set_xticks(x); axes[1].set_xticklabels([f"α₀={k.split('/')[0]}\nα₁={k.split('/')[1]}" for k in al], fontsize=7)
+    axes[1].set_ylim(0, 1.05)
+    axes[1].set_title("Class-conditional conformal (test): α₀ normal / α₁ laundering"); axes[1].legend(fontsize=7, loc="center right")
     save(fig, out / "figures" / "uncertainty.png")
 
-    c = res["conformal"][str(a.alpha)]
+    c = cp.report(p_te, y_te)
     m = res["mc_dropout"]
     md = ["# Uncertainty & human review (TRACE-X, seed %d)" % a.seed, "",
           "## Split conformal (class-conditional), calibrated on val_cal, full test split", "",
-          "| α | coverage normal | coverage laundering | confident normal | confident suspicious | human review | retained precision | retained recall |",
-          "|---|---|---|---|---|---|---|---|"]
+          "α₀ bounds the share of normal transactions pushed out of the 'normal' set; α₁ bounds the share of laundering "
+          "transactions pushed out of the 'suspicious' set. Values are fixed policy choices, not tuned on test labels.", "",
+          "| α₀ (normal) / α₁ (laundering) | coverage normal | coverage laundering | confident normal | confident suspicious | human review | laundering sent to review | retained precision | retained recall |",
+          "|---|---|---|---|---|---|---|---|---|"]
     for k in al:
         r = res["conformal"][k]
         md.append(f"| {k} | {r['coverage_class0']:.4f} | {r['coverage_class1']:.4f} | {r['frac_confident_normal']:.4f} | "
-                  f"{r['frac_confident_suspicious']:.5f} | {r['abstention_rate']:.4f} | {r['retained_precision']:.4f} | {r['retained_recall']:.4f} |")
-    md += ["", f"Thresholds at α={a.alpha}: p ≤ {c['t_normal']:.4f} → normal allowed; p ≥ {c['t_suspicious']:.4f} → suspicious allowed.", "",
+                  f"{r['frac_confident_suspicious']:.5f} | {r['abstention_rate']:.4f} | {r['positives_routed_to_review']:.4f} | "
+                  f"{r['retained_precision']:.4f} | {r['retained_recall']:.4f} |")
+    md += ["", f"Deployed policy α₀={a.alpha_normal}, α₁={a.alpha}: p ≤ {c['t_normal']:.4f} → 'normal' in set; "
+               f"p ≥ {c['t_suspicious']:.4f} → 'suspicious' in set; both or neither → human review.", "",
            f"## MC Dropout (T={a.T}), {m['evaluated_on']}", "",
            f"- Review rule: std > {m['std_threshold_val_cal_q95']:.4f} (95th percentile on val_cal)",
            f"- Abstention rate: {m['abstention_rate']:.4f}; laundering transactions routed to review: {m['positives_routed_to_review']:.4f}",
@@ -133,7 +148,7 @@ def main():
            f"- AUROC of MC std for detecting misclassifications: {m['error_detection_auroc_of_std']}",
            "", "_The system is a decision-support tool; an alert or a 'confident' outcome does not establish that money laundering occurred._"]
     (out / "uncertainty.md").write_text("\n".join(md), encoding="utf-8")
-    print("\n".join(md))
+    print("\n".join(md).encode("ascii", "replace").decode())
 
 
 if __name__ == "__main__":

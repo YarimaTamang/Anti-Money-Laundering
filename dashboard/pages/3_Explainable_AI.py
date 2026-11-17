@@ -29,7 +29,7 @@ with tab_g:
         with c1:
             fig = go.Figure(go.Bar(x=ma[o], y=[names[i] for i in o], orientation="h", marker_color=BLUE))
             fig.update_layout(title=f"Global importance: mean |SHAP| over {len(S)} test transactions", height=520)
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width="stretch")
         with c2:
             fig = go.Figure()
             for r, i in enumerate(o):
@@ -40,11 +40,11 @@ with tab_g:
                                 showlegend=False, hovertemplate=f"{names[i]}<br>SHAP %{{x:+.3f}}<extra></extra>")
             fig.update_layout(title="SHAP summary (colour: low → high feature value)", height=520,
                               yaxis=dict(tickvals=list(range(len(o))), ticktext=[names[i] for i in o]), xaxis_title="SHAP (logit)")
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width="stretch")
         lbl = np.array(gs["labels"])
         diff = pd.DataFrame({"feature": names, "mean SHAP | laundering": S[lbl == 1].mean(0), "mean SHAP | normal": S[lbl == 0].mean(0)})
         st.dataframe(diff.reindex(diff["mean SHAP | laundering"].abs().sort_values(ascending=False).index).head(12),
-                     hide_index=True, use_container_width=True)
+                     hide_index=True, width="stretch")
 
 with tab_l:
     cases = data.cases()
@@ -67,12 +67,12 @@ with tab_l:
             network.render(edges, {g["sender_account"], g["receiver_account"]}, height=430)
             st.caption("GNNExplainer subgraph: orange edges have mask ≥ 0.5; edge width ∝ mask importance.")
         with c2:
-            st.plotly_chart(explain_live.shap_bar(c["shap"]), use_container_width=True)
-        st.plotly_chart(explain_live.ig_bars(c["ig"]), use_container_width=True)
+            st.plotly_chart(explain_live.shap_bar(c["shap"]), width="stretch")
+        st.plotly_chart(explain_live.ig_bars(c["ig"]), width="stretch")
         f = c["fidelity"]
-        st.markdown(f"**Fidelity for this case** - GNN fid+ {f['gnn'].get('fid_plus', float('nan')):+.3f} (random {f['gnn'].get('fid_plus_random', float('nan')):+.3f}); "
-                    f"IG top-3 deletion Δp {f['ig'].get('drop_topk', float('nan')):+.3f} (random {f['ig'].get('drop_random_k', float('nan')):+.3f}); "
-                    f"SHAP top-5 deletion Δp {f['shap']['drop_topk']:+.3f} (random {f['shap']['drop_random_k']:+.3f})")
+        st.markdown(f"**Fidelity for this case** - GNN fid+ (Δlogit) {f['gnn'].get('fid_plus', float('nan')):+.3f} (random {f['gnn'].get('fid_plus_random', float('nan')):+.3f}); "
+                    f"IG top-3 deletion Δlogit {f['ig'].get('drop_topk', float('nan')):+.3f} (random {f['ig'].get('drop_random_k', float('nan')):+.3f}); "
+                    f"SHAP top-5 deletion Δlogit {f['shap']['drop_topk']:+.3f} (random {f['shap']['drop_random_k']:+.3f})")
 
 with tab_q:
     q = data.json_report("explanations/quality.json")
@@ -87,9 +87,9 @@ with tab_q:
                 v = q[meth].get(k)
                 if v:
                     rows.append({"method": meth, "metric": k, "mean": v["mean"], "std": v["std"], "n": v["n"]})
-        st.dataframe(pd.DataFrame(rows), hide_index=True, use_container_width=True)
+        st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
         if q.get("stability_across_seeds"):
             stb = q["stability_across_seeds"]
             st.markdown(f"**Stability across seeds {stb.get('seeds')}** (same transactions, independently trained models)")
-            st.dataframe(pd.DataFrame([{"metric": k, **v} for k, v in stb.items() if isinstance(v, dict)]), hide_index=True, use_container_width=True)
+            st.dataframe(pd.DataFrame([{"metric": k, **v} for k, v in stb.items() if isinstance(v, dict)]), hide_index=True, width="stretch")
         _ = AQUA
