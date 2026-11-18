@@ -507,6 +507,11 @@ docker run -p 8501:8501 -v $PWD/data:/app/data -v $PWD/checkpoints:/app/checkpoi
            -v $PWD/experiments:/app/experiments -v $PWD/reports:/app/reports tracex
 ```
 
+Verification status:
+
+- **API:** `/health`, `/predict/{tx_id}` and `/explain/{tx_id}` were smoke-tested with FastAPI's TestClient. Unknown IDs return 404.
+- **Dockerfile:** provided but **not built or tested**, because Docker was not available on the development machine.
+
 The dashboard and API need the processed data (`data/processed/full`) and a checkpoint (`checkpoints/full/tracex/seed0.pt`). Both are produced by the steps above; neither is committed.
 
 ## 23. Tests
