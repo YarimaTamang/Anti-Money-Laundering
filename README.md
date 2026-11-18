@@ -266,7 +266,7 @@ All baselines use the same splits, the same causal inputs, the target-transactio
 - **Seeds:** 0, 1 and 2 for every model. Ablations use seed 0, plus seed 1 for the four key ablations (sequence-only, graph-only, concat fusion, no temporal encoding). This was a compute budget decision.
 - **Nothing was tuned on the test split.** Hyper-parameters are fixed in [configs/](configs/). Test predictions are made once per run.
 - **Hardware:** AMD Ryzen 7 5800H (8 cores), 15.4 GB RAM, no CUDA GPU. torch 2.x (CPU) and PyTorch Geometric. Two training jobs often shared the CPU, so wall-clock training times are only indicative. Controlled efficiency numbers come from a separate benchmark (§15).
-- **Tracking:** every run logs its configuration, seed, per-epoch metrics, test metrics, duration and checkpoint path to MLflow (`sqlite:///mlflow.db`) and to `experiments/full/<exp>/seed<k>/`.
+- **Tracking:** every run logs its configuration, seed, per-epoch metrics, test metrics, duration and checkpoint path to MLflow (`experiments/mlflow/mlflow.db`) and to `experiments/full/<exp>/seed<k>/`.
 
 ## 14. Evaluation metrics
 
@@ -486,7 +486,7 @@ python scripts/uncertainty.py --exp tracex --seed 0
 python scripts/benchmark_efficiency.py
 
 # experiment tracking UI
-mlflow ui --backend-store-uri sqlite:///mlflow.db
+mlflow ui --backend-store-uri sqlite:///experiments/mlflow/mlflow.db
 ```
 
 Measured on the laptop described in §13 (often with two jobs sharing the CPU):
@@ -540,22 +540,44 @@ The suite covers:
 ## 24. Repository layout
 
 ```
-configs/            data.yaml · training.yaml · models.yaml (all experiments and ablations)
-src/data/           download, preprocessing, profiling, cached pipeline
-src/graph/          causal index, features, static/temporal graph construction, TemporalGraphStore
-src/sequences/      sender/receiver histories, time encoding
-src/models/         layers (EdgeTemporalGATConv, GatedFusion…), TRACE-X, baselines, registry
-src/training/       trainer, losses, checkpoints, run_experiment
-src/evaluation/     metrics, alert budget, calibration, comparison
-src/explainability/ GNNExplainer, SHAP, Integrated Gradients, fidelity, investigator reports
-src/uncertainty/    MC dropout, conformal
-src/api.py          FastAPI service
-dashboard/          Streamlit app (6 pages + components)
-scripts/            queues, explanation/uncertainty/benchmark/screenshot scripts, reproduce.sh
-tests/              pytest suite
-reports/            profiling, results tables and figures, explanations, uncertainty, screenshots
-experiments/full/   per-run config, history, metrics.json and logs (predictions are git-ignored)
-docs/               methodology.md
+Anti-Money_Laundering/
+├── README.md                  project overview (this file)
+├── requirements.txt           pinned dependencies
+├── Dockerfile · .dockerignore container for the dashboard / API
+├── .env.example               optional settings (credentials come from environment variables only)
+│
+├── configs/                   data.yaml · training.yaml · models.yaml (all experiments and ablations)
+├── src/                       library code
+│   ├── data/                  download, preprocessing, profiling, cached pipeline
+│   ├── graph/                 causal index, features, temporal graph store
+│   ├── sequences/             sender / receiver histories, time encoding
+│   ├── models/                layers, TRACE-X, baselines, registry
+│   ├── training/              trainer, losses, checkpoints, run_experiment
+│   ├── evaluation/            metrics, alert budget, calibration, comparison
+│   ├── explainability/        GNNExplainer, SHAP, Integrated Gradients, fidelity, reports
+│   ├── uncertainty/           MC dropout, conformal prediction
+│   └── api.py                 FastAPI service
+├── dashboard/                 Streamlit app (app.py, 6 pages, components)
+├── scripts/                   experiment queue, explanations, uncertainty, benchmark, screenshots, reproduce.sh
+├── tests/                     pytest suite (42 tests)
+│
+├── reports/                   generated results (committed)
+│   ├── profiling/             dataset profile + figures
+│   ├── results/               model / ablation tables, efficiency benchmark, figures
+│   ├── explanations/          10 explained cases, global SHAP, quality metrics
+│   ├── uncertainty/           conformal + MC-dropout report
+│   └── dashboard_screenshots/
+├── experiments/full/          one folder per experiment/seed: config, history, metrics.json, train.log
+├── docs/
+│   ├── methodology.md         full technical detail
+│   ├── completion_report.md   honest completion report (sections A–I)
+│   └── presentation/          10-slide project presentation (.pptx)
+│
+└── (git-ignored, created locally)
+    data/                      raw CSV + processed arrays
+    checkpoints/               trained model weights
+    experiments/dev/           dev-mode runs used by the tests
+    experiments/mlflow/        MLflow tracking database + artifacts
 ```
 
 ## 25. Limitations and future work

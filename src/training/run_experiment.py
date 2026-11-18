@@ -183,8 +183,13 @@ def _mlflow_log(exp, seed, mode, params, cfg, metrics, ck_path, out):
         import mlflow
 
         os.environ.setdefault("MLFLOW_DISABLE_AGENT_HINT", "1")
-        mlflow.set_tracking_uri("sqlite:///" + (PROJECT_ROOT / "mlflow.db").as_posix())
-        mlflow.set_experiment(f"tracex-{mode}")
+        store = PROJECT_ROOT / "experiments" / "mlflow"  # tracking DB + artifacts live together here
+        store.mkdir(parents=True, exist_ok=True)
+        mlflow.set_tracking_uri("sqlite:///" + (store / "mlflow.db").as_posix())
+        name = f"tracex-{mode}"
+        if mlflow.get_experiment_by_name(name) is None:
+            mlflow.create_experiment(name, artifact_location=(store / "mlruns").as_uri())
+        mlflow.set_experiment(name)
         with mlflow.start_run(run_name=f"{exp}-seed{seed}"):
             mlflow.log_params({"exp": exp, "seed": seed, **{f"p_{k}": v for k, v in params.items()},
                                **{f"t_{k}": v for k, v in cfg.items() if not isinstance(v, (dict, list))}})
