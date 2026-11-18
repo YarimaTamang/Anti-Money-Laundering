@@ -29,7 +29,7 @@ This report lists what was actually executed and verified. Anything that was not
 | Streamlit dashboard (6 pages) | ✅ | ✅ all pages rendered and screenshotted |
 | MLflow tracking (SQLite) | ✅ | ✅ every run logged |
 | FastAPI `/health`, `/predict`, `/explain` | ✅ | ✅ TestClient smoke test |
-| Dockerfile | ✅ | ❌ **not built**: Docker not installed on this machine |
+| Dockerfile / Docker image | ✅ | ✅ built (Docker 29.9.3); dashboard container (6 pages) and API container verified |
 | Optional TGN extension | ❌ | — not implemented (optional) |
 | Demo video | ❌ | — not produced |
 
@@ -135,7 +135,6 @@ All explanations are for TRACE-X seed 0 on 10 test cases (5 TP, 2 FP, 2 FN, 1 TN
   - One autograd warning in the trainer.
 - **Remaining issues:**
   - Third-party deprecation warnings (torch.jit and an anyio pytest-plugin alias).
-  - The Dockerfile has not been built.
   - Tests use dev-mode artefacts, so a fresh clone must run the dev pipeline and a 1-epoch dev checkpoint first (`scripts/reproduce.sh` does this).
 
 ## G. Dashboard status

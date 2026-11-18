@@ -510,7 +510,9 @@ docker run -p 8501:8501 -v $PWD/data:/app/data -v $PWD/checkpoints:/app/checkpoi
 Verification status:
 
 - **API:** `/health`, `/predict/{tx_id}` and `/explain/{tx_id}` were smoke-tested with FastAPI's TestClient. Unknown IDs return 404.
-- **Dockerfile:** provided but **not built or tested**, because Docker was not available on the development machine.
+- **Docker:** the image was built with Docker Desktop 29.9.3 on 18 Nov 2026 (2.81 GB, CPU-only PyTorch).
+  - Dashboard container: all 6 pages loaded with no errors.
+  - API container (`docker run ... tracex uvicorn src.api:app --host 0.0.0.0 --port 8000`): returned the same prediction as the non-container run (tx 4723765: score 0.99995, calibrated 0.8972), and 404 for unknown IDs.
 
 The dashboard and API need the processed data (`data/processed/full`) and a checkpoint (`checkpoints/full/tracex/seed0.pt`). Both are produced by the steps above; neither is committed.
 
