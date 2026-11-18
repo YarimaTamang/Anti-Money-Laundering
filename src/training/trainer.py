@@ -101,7 +101,7 @@ def fit(model, store, train_pos: np.ndarray, train_neg: np.ndarray, val_eids: np
                 loss.backward()
                 torch.nn.utils.clip_grad_norm_(model.parameters(), cfg["grad_clip"])
                 opt.step()
-            tot += float(loss)
+            tot += float(loss.detach())
             nb += 1
         t_train = time.time() - t0
         vl = predict(model, store, val_eids, cfg, device)

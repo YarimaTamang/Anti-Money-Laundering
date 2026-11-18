@@ -1,0 +1,6 @@
+{
+ "alpha_laundering": 0.1,
+ "alpha_normal": 0.01,
+ "t_normal": 0.7374656796455383,
+ "t_suspicious": 0.5942118763923645
+}

@@ -89,7 +89,8 @@ def latency(model, store, cfg, eids, device) -> dict:
     return {"single_tx_latency_ms_median": float(np.median(ts) * 1000), "single_tx_latency_ms_p95": float(np.percentile(ts, 95) * 1000)}
 
 
-def run(exp: str, seed: int, mode: str = "full", overrides: dict | None = None, out_root: str | Path | None = None) -> dict:
+def run(exp: str, seed: int, mode: str = "full", overrides: dict | None = None, out_root: str | Path | None = None,
+        eval_only: bool = False) -> dict:
     arch, params, cfg = experiment_config(exp)
     cfg = deep_update(cfg, overrides or {})
     out_root = Path(out_root) if out_root else PROJECT_ROOT / "experiments" / mode
@@ -116,11 +117,22 @@ def run(exp: str, seed: int, mode: str = "full", overrides: dict | None = None, 
     vs_e, vs_w = eval_subset(store, SPLIT_VAL_SELECT, cfg["eval_subsample_neg"], cfg["eval_subsample_seed"])
     vc_e, vc_w = eval_subset(store, SPLIT_VAL_CAL, cfg["eval_subsample_neg"], cfg["eval_subsample_seed"])
 
-    t0 = time.time()
-    model, history, best = fit(model, store, train_pos, train_neg, vs_e, vs_w, cfg, seed, log.info, device)
-    train_time = time.time() - t0
-    pd.DataFrame(history).to_csv(out / "history.csv", index=False)
-    save_checkpoint(ck_path, model, arch, params, dims, {"exp": exp, "seed": seed, "mode": mode, "cfg": cfg})
+    if eval_only:
+        # Resume after an interrupted run whose training finished: the best-validation checkpoint and
+        # history.csv were already written by fit(); evaluation below is identical to a normal run.
+        ck = torch.load(ck_path, map_location=device, weights_only=False)
+        model.load_state_dict(ck["state_dict"])
+        hdf = pd.read_csv(out / "history.csv")
+        history = hdf.to_dict("records")
+        best = {"best_val_pr_auc": float(hdf["val_pr_auc"].max()), "best_epoch": int(hdf["val_pr_auc"].argmax() + 1)}
+        train_time = float(hdf["epoch_total_s"].sum())
+        log.info(f"eval-only: restored {ck_path} (best epoch {best['best_epoch']}, train time from history {train_time/60:.1f} min)")
+    else:
+        t0 = time.time()
+        model, history, best = fit(model, store, train_pos, train_neg, vs_e, vs_w, cfg, seed, log.info, device)
+        train_time = time.time() - t0
+        pd.DataFrame(history).to_csv(out / "history.csv", index=False)
+        save_checkpoint(ck_path, model, arch, params, dims, {"exp": exp, "seed": seed, "mode": mode, "cfg": cfg})
 
     # ---- selection on val_select, calibration on val_cal (no test labels involved)
     vs_l = predict(model, store, vs_e, cfg, device)
@@ -195,6 +207,7 @@ if __name__ == "__main__":
     ap.add_argument("--max-epochs", type=int)
     ap.add_argument("--neg-per-epoch", type=int)
     ap.add_argument("--threads", type=int)
+    ap.add_argument("--eval-only", action="store_true", help="evaluate an existing checkpoint + history (resume after interruption)")
     a = ap.parse_args()
     ov = {}
     if a.max_epochs:
@@ -204,4 +217,4 @@ if __name__ == "__main__":
     if a.threads:
         ov["num_threads"] = a.threads
     os.environ.setdefault("KMP_DUPLICATE_LIB_OK", "TRUE")
-    run(a.exp, a.seed, a.mode, ov)
+    run(a.exp, a.seed, a.mode, ov, eval_only=a.eval_only)

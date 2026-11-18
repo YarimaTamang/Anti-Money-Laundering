@@ -114,9 +114,18 @@ def main(mode: str = "full"):
         cols = [("pr_auc", 4), ("roc_auc", 4), ("f1", 4), ("r@0.5%", 4), ("p@0.5%", 4), ("params", 0), ("train_min", 1)]
         base = agg.loc["tracex", "pr_auc_mean"] if "tracex" in agg.index else np.nan
         lines = ["# Ablation study (full test split, mean ± std over completed seeds)", "", md_table(agg, abl, cols), "",
-                 "ΔPR-AUC relative to full TRACE-X:", ""]
+                 "ΔPR-AUC relative to full TRACE-X. 'vs mean' compares with the 3-seed TRACE-X mean; 'paired' compares "
+                 "each ablation seed with the TRACE-X run of the same seed and averages over the seeds both share. "
+                 "TRACE-X itself varies across seeds (see per-seed values below), so differences smaller than that spread "
+                 "are not evidence of a real effect.", "",
+                 "| Variant | Seeds | ΔPR-AUC vs mean | ΔPR-AUC paired (same seeds) |", "|---|---|---|---|"]
+        tx = df[df.exp == "tracex"].set_index("seed")["pr_auc"]
         for e in abl[1:]:
-            lines.append(f"- {DISPLAY.get(e, e)}: {agg.loc[e, 'pr_auc_mean'] - base:+.4f}")
+            ae = df[df.exp == e].set_index("seed")["pr_auc"]
+            common = [s for s in ae.index if s in tx.index]
+            paired = float(np.mean([ae[s] - tx[s] for s in common])) if common else np.nan
+            lines.append(f"| {DISPLAY.get(e, e)} | {len(ae)} | {agg.loc[e, 'pr_auc_mean'] - base:+.4f} | {paired:+.4f} |")
+        lines += ["", "TRACE-X per-seed test PR-AUC: " + ", ".join(f"seed {s}: {v:.4f}" for s, v in tx.items())]
         (out / "results_ablation.md").write_text("\n".join(lines), encoding="utf-8")
     _figures(mode, agg, df, models, abl, fig_dir)
     print((out / "results_models.md").read_text(encoding="utf-8"))

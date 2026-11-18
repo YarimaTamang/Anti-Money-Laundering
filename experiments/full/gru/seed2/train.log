@@ -1,0 +1,13 @@
+10:57:44 | INFO | gru.s2 | exp=gru arch=gru seed=2 mode=full device=cpu params=36801 needs=('seq',)
+10:58:08 | INFO | gru.s2 | epoch 01 train_loss=0.6976 val_loss=1.4464 val_PR-AUC=0.1715 lr=1.0e-03 (24s)
+10:58:32 | INFO | gru.s2 | epoch 02 train_loss=0.3750 val_loss=2.0661 val_PR-AUC=0.2615 lr=1.0e-03 (24s)
+10:58:53 | INFO | gru.s2 | epoch 03 train_loss=0.3312 val_loss=1.6083 val_PR-AUC=0.2899 lr=1.0e-03 (22s)
+10:59:15 | INFO | gru.s2 | epoch 04 train_loss=0.3191 val_loss=2.1578 val_PR-AUC=0.2976 lr=1.0e-03 (22s)
+10:59:36 | INFO | gru.s2 | epoch 05 train_loss=0.3007 val_loss=1.8479 val_PR-AUC=0.2821 lr=1.0e-03 (21s)
+10:59:57 | INFO | gru.s2 | epoch 06 train_loss=0.3048 val_loss=1.6893 val_PR-AUC=0.2998 lr=1.0e-03 (21s)
+11:00:22 | INFO | gru.s2 | epoch 07 train_loss=0.3008 val_loss=1.6336 val_PR-AUC=0.3041 lr=1.0e-03 (24s)
+11:00:45 | INFO | gru.s2 | epoch 08 train_loss=0.2945 val_loss=2.0222 val_PR-AUC=0.2805 lr=1.0e-03 (23s)
+11:01:06 | INFO | gru.s2 | epoch 09 train_loss=0.2917 val_loss=1.8235 val_PR-AUC=0.2622 lr=5.0e-04 (21s)
+11:01:27 | INFO | gru.s2 | epoch 10 train_loss=0.2838 val_loss=1.7314 val_PR-AUC=0.2787 lr=5.0e-04 (21s)
+11:01:27 | INFO | gru.s2 | early stopping at epoch 10 (best val PR-AUC 0.3041)
+11:02:17 | INFO | gru.s2 | TEST PR-AUC=0.3969 ROC-AUC=0.9883 F1=0.4090 P=0.4019 R=0.4162 R@0.5%=0.6038 train=3.7min

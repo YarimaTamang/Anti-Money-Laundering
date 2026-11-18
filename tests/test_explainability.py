@@ -41,7 +41,10 @@ def test_gnn_explainer_masks_valid_and_causal(ex, eid):
     ts = ex.store.a["ts"]
     assert all(ts[e["eid"]] < ts[eid] for e in g["edges"])
     f = gnn_explainer.edge_fidelity(ex, eid, m, n_random=3)
-    assert 0 <= f["p"] <= 1
+    # fidelity is reported in logit units (signed towards the predicted class)
+    assert np.isfinite(f["logit"])
+    assert all(np.isfinite(f[k]) for k in ("fid_plus", "fid_plus_random", "fid_minus", "fid_minus_random", "fid_no_graph"))
+    assert 0 < f["k"] <= f["E"] == len(m)
 
 
 def test_shap_wrapper_reproduces_model_and_is_additive(ex, eid):

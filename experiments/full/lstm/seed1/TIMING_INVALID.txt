@@ -1,0 +1,1 @@
+System sleep 2026-11-17 00:37-10:37 (battery) occurred during this run; wall-clock timing metrics are invalid and excluded from efficiency tables. Accuracy metrics are unaffected.

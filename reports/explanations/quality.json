@@ -155,7 +155,43 @@
  },
  "ig_completeness_abs_delta_mean": 0.0009529173374176025,
  "shap_additivity_abs_gap_mean": 1.9073486425824627e-07,
- "stability_across_seeds": null,
+ "stability_across_seeds": {
+  "shap_spearman": {
+   "mean": 0.6776803118908381,
+   "std": 0.1467103786033387,
+   "n_pairs": 12
+  },
+  "shap_top5_jaccard": {
+   "mean": 0.6150793650793652,
+   "std": 0.15966983760897388,
+   "n_pairs": 12
+  },
+  "ig_step_spearman": {
+   "mean": 0.6832745857513659,
+   "std": 0.2525190068642754,
+   "n_pairs": 12
+  },
+  "ig_top3_jaccard": {
+   "mean": 0.6666666666666666,
+   "std": 0.3726779962499649,
+   "n_pairs": 12
+  },
+  "gnn_edge_spearman": {
+   "mean": 0.9960125996873024,
+   "std": 0.008772666615489463,
+   "n_pairs": 12
+  },
+  "gnn_top5_jaccard": {
+   "mean": 1.0,
+   "std": 0.0,
+   "n_pairs": 12
+  },
+  "seeds": [
+   0,
+   1,
+   2
+  ]
+ },
  "per_case": {
   "gnn": [
    {

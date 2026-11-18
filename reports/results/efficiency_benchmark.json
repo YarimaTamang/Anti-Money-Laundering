@@ -1,0 +1,79 @@
+[
+ {
+  "exp": "lstm",
+  "params": 42945,
+  "train_samples_per_s": 1311.4007533769184,
+  "infer_tx_per_s": 15774.571513970037,
+  "latency_ms_median": 6.09719999920344,
+  "latency_ms_p95": 11.34857999822998,
+  "peak_memory_mb": 1177.78125,
+  "threads": 8,
+  "est_minutes_per_epoch_train": 1.935576642098445
+ },
+ {
+  "exp": "gru",
+  "params": 36801,
+  "train_samples_per_s": 7286.233714485478,
+  "infer_tx_per_s": 22134.242750240854,
+  "latency_ms_median": 3.4310500013816636,
+  "latency_ms_p95": 3.841315000136092,
+  "peak_memory_mb": 1155.35546875,
+  "threads": 8,
+  "est_minutes_per_epoch_train": 0.34837156837562566
+ },
+ {
+  "exp": "gcn",
+  "params": 27713,
+  "train_samples_per_s": 753.585941277182,
+  "infer_tx_per_s": 2200.446020093854,
+  "latency_ms_median": 8.705899999768008,
+  "latency_ms_p95": 27.222130001064215,
+  "peak_memory_mb": 2614.078125,
+  "threads": 8,
+  "est_minutes_per_epoch_train": 3.3683174375104614
+ },
+ {
+  "exp": "graphsage",
+  "params": 35905,
+  "train_samples_per_s": 2473.2801210984594,
+  "infer_tx_per_s": 2743.8473318248234,
+  "latency_ms_median": 2.8613499998755287,
+  "latency_ms_p95": 6.202815000142436,
+  "peak_memory_mb": 2403.66796875,
+  "threads": 8,
+  "est_minutes_per_epoch_train": 1.0262956650212847
+ },
+ {
+  "exp": "gat",
+  "params": 31809,
+  "train_samples_per_s": 1147.2120545637583,
+  "infer_tx_per_s": 1459.1178991976058,
+  "latency_ms_median": 6.286800000452786,
+  "latency_ms_p95": 7.747964998088719,
+  "peak_memory_mb": 2814.453125,
+  "threads": 8,
+  "est_minutes_per_epoch_train": 2.212595881091829
+ },
+ {
+  "exp": "gat_lstm",
+  "params": 64577,
+  "train_samples_per_s": 1004.2896506301978,
+  "infer_tx_per_s": 1355.6505484539935,
+  "latency_ms_median": 8.843999999953667,
+  "latency_ms_p95": 11.52955000034126,
+  "peak_memory_mb": 2952.5234375,
+  "threads": 8,
+  "est_minutes_per_epoch_train": 2.5274746832986454
+ },
+ {
+  "exp": "tracex",
+  "params": 238369,
+  "train_samples_per_s": 1175.537748250476,
+  "infer_tx_per_s": 1568.1470738186638,
+  "latency_ms_median": 11.25299999876006,
+  "latency_ms_p95": 17.34290000058536,
+  "peak_memory_mb": 3070.171875,
+  "threads": 8,
+  "est_minutes_per_epoch_train": 2.1592812910043775
+ }
+]

@@ -1,0 +1,42 @@
+exp: gru
+arch: gru
+params:
+  hidden: 64
+  heads: 4
+  dropout: 0.2
+training:
+  seeds:
+  - 0
+  - 1
+  - 2
+  device: auto
+  num_threads: 4
+  amp: auto
+  batch_size: 1024
+  eval_batch_size: 4096
+  max_epochs: 20
+  patience: 3
+  lr: 0.001
+  weight_decay: 0.0001
+  grad_clip: 1.0
+  scheduler:
+    type: plateau
+    factor: 0.5
+    patience: 1
+  neg_per_epoch: 150000
+  loss:
+    type: bce
+    pos_weight: auto
+  seq_len: 10
+  k1: 10
+  k2: 5
+  eval_subsample_neg: 50000
+  eval_subsample_seed: 12345
+  mlflow: true
+seed: 1
+mode: full
+dims:
+  edge_dim: 27
+  node_dim: 11
+  seq_dim: 28
+n_params: 36801

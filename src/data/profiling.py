@@ -98,10 +98,15 @@ def profile(mode: str = "full") -> dict:
     axes[0].plot(hourly.index, hourly["size"], color=NORMAL); axes[0].set_ylabel("transactions / 6h")
     axes[0].set_title("Temporal distribution (6-hour bins)")
     axes[1].plot(hourly.index, hourly["sum"], color=SUSPICIOUS); axes[1].set_ylabel("laundering / 6h")
-    for name, (a, b) in meta["split_time_ranges"].items():
+    # shaded split bands (alternating grey) labelled above the top panel, staggered so short splits don't collide
+    for i, (name, (a, b)) in enumerate(meta["split_time_ranges"].items()):
+        a, b = pd.Timestamp(a), pd.Timestamp(b)
         for ax in axes:
-            ax.axvline(pd.Timestamp(a), color="#8a8984", lw=0.8, ls="--")
-        axes[0].text(pd.Timestamp(a), axes[0].get_ylim()[1] * 0.9, " " + name, fontsize=7, color="#52514e")
+            ax.axvspan(a, b, color="#8a8984", alpha=0.10 if i % 2 == 0 else 0.22, lw=0)
+        axes[0].annotate(name, xy=(a + (b - a) / 2, 1.0), xycoords=("data", "axes fraction"),
+                         xytext=(0, 3 + 9 * (i % 2)), textcoords="offset points", ha="center", va="bottom",
+                         fontsize=7, color="#52514e")
+    axes[0].set_title("Temporal distribution (6-hour bins) with chronological splits", pad=22)
     fig.autofmt_xdate()
     save(fig, out / "temporal_distribution.png")
 

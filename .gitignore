@@ -22,3 +22,8 @@ __pycache__/
 kaggle.json
 # scratch
 scripts/_*.py
+# temporary run logs
+experiments/*.err
+experiments/*.log
+experiments/**/.claim
+experiments/**/*.out

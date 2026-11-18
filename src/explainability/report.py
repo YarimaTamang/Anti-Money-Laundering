@@ -11,6 +11,9 @@ import numpy as np
 DISCLAIMER = "Decision-support alert, not proof of money laundering."
 
 
+GNN_DIFFUSE = ("Caution: no neighbouring transaction reached a GNNExplainer mask of 0.5 - the graph evidence for this "
+               "score is diffuse, so the listed accounts should not be read as specific accomplices.")
+
 def _cnt(v: float) -> int:
     return int(round(float(np.expm1(v))))
 
@@ -67,6 +70,8 @@ def build_summary(tx: dict, prob: float, prob_calibrated: float | None, sender: 
                 f"tx {e['tx_id']} (hop {e['hop']}, mask {e['importance']:.2f})" for e in top_edges) + ".")
         ef = sorted(gnn["edge_feature_importance"].items(), key=lambda kv: -kv[1])[:3]
         findings.append("Edge attributes retained by the graph explanation: " + ", ".join(f"{k} ({v:.2f})" for k, v in ef) + ".")
+        if gnn["edges"] and max(e["importance"] for e in gnn["edges"]) < 0.5:
+            findings.append(GNN_DIFFUSE)
     if uncertainty:
         parts = []
         mc = uncertainty.get("mc_std")
@@ -78,6 +83,7 @@ def build_summary(tx: dict, prob: float, prob_calibrated: float | None, sender: 
             findings.append("Uncertainty: " + "; ".join(parts) + ".")
     findings.append(DISCLAIMER)
     return {
+        "graph_explanation_diffuse": bool(gnn and gnn["edges"] and max(e["importance"] for e in gnn["edges"]) < 0.5),
         "transaction": tx, "probability": prob, "probability_calibrated": prob_calibrated,
         "sender_profile": sender, "receiver_profile": receiver,
         "important_connected_accounts": [{"account": name(a["account"]), "importance": a["importance"]} for a in imp_acc],
@@ -113,6 +119,8 @@ def to_markdown(s: dict) -> str:
     if s["important_connected_accounts"]:
         lines += ["## Important connected accounts (GNNExplainer)", ""]
         lines += [f"- {a['account']} — mask importance {a['importance']:.2f}" for a in s["important_connected_accounts"]]
+        if s.get("graph_explanation_diffuse"):
+            lines += ["", f"_{GNN_DIFFUSE}_"]
         lines.append("")
     if s["top_features"]:
         lines += ["## Feature contributions (Kernel SHAP, logit units)", "", "| Feature | SHAP |", "|---|---|"]

@@ -1,0 +1,9 @@
+10:40:39 | INFO | lstm.s2 | exp=lstm arch=lstm seed=2 mode=full device=cpu params=42945 needs=('seq',)
+10:41:32 | INFO | lstm.s2 | epoch 01 train_loss=0.7158 val_loss=1.5045 val_PR-AUC=0.2152 lr=1.0e-03 (53s)
+10:42:20 | INFO | lstm.s2 | epoch 02 train_loss=0.3952 val_loss=2.2549 val_PR-AUC=0.2935 lr=1.0e-03 (48s)
+10:42:58 | INFO | lstm.s2 | epoch 03 train_loss=0.3412 val_loss=1.6975 val_PR-AUC=0.3065 lr=1.0e-03 (37s)
+10:43:41 | INFO | lstm.s2 | epoch 04 train_loss=0.3258 val_loss=1.9558 val_PR-AUC=0.2846 lr=1.0e-03 (44s)
+10:44:25 | INFO | lstm.s2 | epoch 05 train_loss=0.3154 val_loss=1.8290 val_PR-AUC=0.2893 lr=5.0e-04 (44s)
+10:45:01 | INFO | lstm.s2 | epoch 06 train_loss=0.2963 val_loss=1.7594 val_PR-AUC=0.2773 lr=5.0e-04 (36s)
+10:45:01 | INFO | lstm.s2 | early stopping at epoch 6 (best val PR-AUC 0.3065)
+10:46:16 | INFO | lstm.s2 | TEST PR-AUC=0.3859 ROC-AUC=0.9871 F1=0.3860 P=0.3611 R=0.4146 R@0.5%=0.5693 train=4.4min

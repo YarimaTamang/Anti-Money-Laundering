@@ -1,0 +1,10 @@
+14:11:57 | INFO | tracex.s2 | exp=tracex arch=tracex seed=2 mode=full device=cpu params=238369 needs=('seq', 'graph')
+14:17:26 | INFO | tracex.s2 | epoch 01 train_loss=0.6299 val_loss=1.8012 val_PR-AUC=0.2849 lr=1.0e-03 (329s)
+14:21:24 | INFO | tracex.s2 | epoch 02 train_loss=0.3454 val_loss=1.4953 val_PR-AUC=0.3645 lr=1.0e-03 (237s)
+14:25:45 | INFO | tracex.s2 | epoch 03 train_loss=0.3159 val_loss=1.2820 val_PR-AUC=0.3589 lr=1.0e-03 (262s)
+14:29:54 | INFO | tracex.s2 | epoch 04 train_loss=0.2958 val_loss=1.7383 val_PR-AUC=0.3981 lr=1.0e-03 (249s)
+14:33:57 | INFO | tracex.s2 | epoch 05 train_loss=0.2840 val_loss=1.5297 val_PR-AUC=0.3662 lr=1.0e-03 (243s)
+14:38:16 | INFO | tracex.s2 | epoch 06 train_loss=0.2911 val_loss=1.6451 val_PR-AUC=0.3871 lr=5.0e-04 (259s)
+14:42:15 | INFO | tracex.s2 | epoch 07 train_loss=0.2754 val_loss=1.4605 val_PR-AUC=0.3666 lr=5.0e-04 (240s)
+14:42:15 | INFO | tracex.s2 | early stopping at epoch 7 (best val PR-AUC 0.3981)
+16:05:43 | INFO | tracex.s2 | TEST PR-AUC=0.4683 ROC-AUC=0.9894 F1=0.4650 P=0.4604 R=0.4697 R@0.5%=0.6717 train=30.3min

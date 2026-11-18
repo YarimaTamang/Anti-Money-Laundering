@@ -1,0 +1,11 @@
+20:53:05 | INFO | abl_no_temporal_enc.s0 | exp=abl_no_temporal_enc arch=tracex seed=0 mode=full device=cpu params=175361 needs=('seq', 'graph')
+20:57:52 | INFO | abl_no_temporal_enc.s0 | epoch 01 train_loss=0.5558 val_loss=1.8567 val_PR-AUC=0.3350 lr=1.0e-03 (287s)
+21:01:49 | INFO | abl_no_temporal_enc.s0 | epoch 02 train_loss=0.3059 val_loss=1.8801 val_PR-AUC=0.3479 lr=1.0e-03 (237s)
+21:06:13 | INFO | abl_no_temporal_enc.s0 | epoch 03 train_loss=0.2920 val_loss=1.7372 val_PR-AUC=0.3890 lr=1.0e-03 (263s)
+21:11:00 | INFO | abl_no_temporal_enc.s0 | epoch 04 train_loss=0.2798 val_loss=1.7697 val_PR-AUC=0.3900 lr=1.0e-03 (288s)
+21:15:57 | INFO | abl_no_temporal_enc.s0 | epoch 05 train_loss=0.2771 val_loss=1.5942 val_PR-AUC=0.3988 lr=1.0e-03 (296s)
+21:20:26 | INFO | abl_no_temporal_enc.s0 | epoch 06 train_loss=0.2694 val_loss=1.6209 val_PR-AUC=0.3502 lr=1.0e-03 (269s)
+21:24:14 | INFO | abl_no_temporal_enc.s0 | epoch 07 train_loss=0.2640 val_loss=1.9300 val_PR-AUC=0.3831 lr=5.0e-04 (227s)
+21:27:37 | INFO | abl_no_temporal_enc.s0 | epoch 08 train_loss=0.2570 val_loss=1.6192 val_PR-AUC=0.3872 lr=5.0e-04 (203s)
+21:27:37 | INFO | abl_no_temporal_enc.s0 | early stopping at epoch 8 (best val PR-AUC 0.3988)
+21:40:51 | INFO | abl_no_temporal_enc.s0 | TEST PR-AUC=0.5132 ROC-AUC=0.9893 F1=0.4912 P=0.4716 R=0.5125 R@0.5%=0.6667 train=34.5min

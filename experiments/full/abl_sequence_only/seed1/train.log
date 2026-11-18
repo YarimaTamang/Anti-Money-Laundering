@@ -1,0 +1,12 @@
+02:58:12 | INFO | abl_sequence_only.s1 | exp=abl_sequence_only arch=tracex seed=1 mode=full device=cpu params=111873 needs=('seq',)
+02:58:53 | INFO | abl_sequence_only.s1 | epoch 01 train_loss=0.7399 val_loss=1.5801 val_PR-AUC=0.2031 lr=1.0e-03 (40s)
+02:59:34 | INFO | abl_sequence_only.s1 | epoch 02 train_loss=0.3759 val_loss=1.9749 val_PR-AUC=0.2965 lr=1.0e-03 (41s)
+03:00:15 | INFO | abl_sequence_only.s1 | epoch 03 train_loss=0.3420 val_loss=1.5072 val_PR-AUC=0.3295 lr=1.0e-03 (41s)
+03:00:56 | INFO | abl_sequence_only.s1 | epoch 04 train_loss=0.3253 val_loss=1.3537 val_PR-AUC=0.3168 lr=1.0e-03 (41s)
+03:01:39 | INFO | abl_sequence_only.s1 | epoch 05 train_loss=0.3170 val_loss=1.4757 val_PR-AUC=0.3718 lr=1.0e-03 (43s)
+03:02:21 | INFO | abl_sequence_only.s1 | epoch 06 train_loss=0.3077 val_loss=1.4626 val_PR-AUC=0.4077 lr=1.0e-03 (42s)
+03:03:01 | INFO | abl_sequence_only.s1 | epoch 07 train_loss=0.3180 val_loss=1.7120 val_PR-AUC=0.3838 lr=1.0e-03 (40s)
+03:03:39 | INFO | abl_sequence_only.s1 | epoch 08 train_loss=0.3112 val_loss=1.4489 val_PR-AUC=0.3727 lr=5.0e-04 (38s)
+03:04:19 | INFO | abl_sequence_only.s1 | epoch 09 train_loss=0.2925 val_loss=1.6445 val_PR-AUC=0.4049 lr=5.0e-04 (40s)
+03:04:19 | INFO | abl_sequence_only.s1 | early stopping at epoch 9 (best val PR-AUC 0.4077)
+03:05:42 | INFO | abl_sequence_only.s1 | TEST PR-AUC=0.4558 ROC-AUC=0.9880 F1=0.4704 P=0.5425 R=0.4151 R@0.5%=0.6372 train=6.1min

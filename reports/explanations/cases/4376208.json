@@ -94,9 +94,11 @@
    "Total sequence attribution: sender history +0.289, receiver history +2.594 (logit units).",
    "Most influential neighbouring transactions (GNNExplainer mask): tx 4925413 (hop 2, mask 0.11), tx 4376205 (hop 2, mask 0.10), tx 4185746 (hop 2, mask 0.10), tx 4376008 (hop 2, mask 0.10), tx 4256206 (hop 2, mask 0.10).",
    "Edge attributes retained by the graph explanation: fmt=Credit Card (0.10), cur=Shekel (0.10), fmt=Cheque (0.10).",
+   "Caution: no neighbouring transaction reached a GNNExplainer mask of 0.5 - the graph evidence for this score is diffuse, so the listed accounts should not be read as specific accomplices.",
    "Decision-support alert, not proof of money laundering."
   ],
-  "disclaimer": "Decision-support alert, not proof of money laundering."
+  "disclaimer": "Decision-support alert, not proof of money laundering.",
+  "graph_explanation_diffuse": true
  },
  "gnn": {
   "eid": 5077863,

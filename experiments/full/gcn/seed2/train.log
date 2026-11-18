@@ -1,0 +1,11 @@
+13:56:56 | INFO | gcn.s2 | exp=gcn arch=gcn seed=2 mode=full device=cpu params=27713 needs=('graph',)
+13:59:11 | INFO | gcn.s2 | epoch 01 train_loss=0.6728 val_loss=2.7529 val_PR-AUC=0.1027 lr=1.0e-03 (135s)
+14:00:58 | INFO | gcn.s2 | epoch 02 train_loss=0.3796 val_loss=2.4873 val_PR-AUC=0.0904 lr=1.0e-03 (106s)
+14:02:56 | INFO | gcn.s2 | epoch 03 train_loss=0.3659 val_loss=2.4459 val_PR-AUC=0.1020 lr=5.0e-04 (119s)
+14:04:57 | INFO | gcn.s2 | epoch 04 train_loss=0.3462 val_loss=2.2441 val_PR-AUC=0.1130 lr=5.0e-04 (121s)
+14:06:47 | INFO | gcn.s2 | epoch 05 train_loss=0.3307 val_loss=2.1764 val_PR-AUC=0.1335 lr=5.0e-04 (109s)
+14:08:39 | INFO | gcn.s2 | epoch 06 train_loss=0.3321 val_loss=2.0902 val_PR-AUC=0.1257 lr=5.0e-04 (112s)
+14:10:32 | INFO | gcn.s2 | epoch 07 train_loss=0.3251 val_loss=2.1617 val_PR-AUC=0.1135 lr=2.5e-04 (113s)
+14:11:47 | INFO | gcn.s2 | epoch 08 train_loss=0.3217 val_loss=2.2969 val_PR-AUC=0.1230 lr=2.5e-04 (75s)
+14:11:47 | INFO | gcn.s2 | early stopping at epoch 8 (best val PR-AUC 0.1335)
+14:18:49 | INFO | gcn.s2 | TEST PR-AUC=0.2629 ROC-AUC=0.9837 F1=0.3248 P=0.2851 R=0.3773 R@0.5%=0.5364 train=14.8min

@@ -34,8 +34,13 @@ def main():
             if name == "06_investigation_reports":
                 btn = pg.get_by_role("button", name="Generate report")
                 if btn.count():
+                    pg.wait_for_timeout(3000)
                     btn.first.click()
-                    pg.get_by_text("TRACE-X investigation report").first.wait_for(timeout=600000)
+                    pg.get_by_text("Main explanation findings").first.wait_for(timeout=600000)
+                    pg.wait_for_timeout(3000)
+                    pg.screenshot(path=str(out / f"{name}.png"), full_page=False)
+                    print("saved", name, flush=True)
+                    continue
             pg.wait_for_timeout(a.wait)
             pg.screenshot(path=str(out / f"{name}.png"), full_page=False)
             print("saved", name, flush=True)

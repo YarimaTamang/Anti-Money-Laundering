@@ -1,0 +1,9 @@
+03:25:05 | INFO | abl_concat_fusion.s1 | exp=abl_concat_fusion arch=tracex seed=1 mode=full device=cpu params=151841 needs=('seq', 'graph')
+03:29:00 | INFO | abl_concat_fusion.s1 | epoch 01 train_loss=0.6245 val_loss=1.3517 val_PR-AUC=0.2405 lr=1.0e-03 (234s)
+03:32:50 | INFO | abl_concat_fusion.s1 | epoch 02 train_loss=0.3510 val_loss=1.4400 val_PR-AUC=0.3255 lr=1.0e-03 (230s)
+03:36:38 | INFO | abl_concat_fusion.s1 | epoch 03 train_loss=0.3037 val_loss=1.5570 val_PR-AUC=0.3958 lr=1.0e-03 (228s)
+03:40:30 | INFO | abl_concat_fusion.s1 | epoch 04 train_loss=0.3010 val_loss=1.0908 val_PR-AUC=0.3445 lr=1.0e-03 (231s)
+03:44:14 | INFO | abl_concat_fusion.s1 | epoch 05 train_loss=0.2855 val_loss=1.2167 val_PR-AUC=0.3181 lr=5.0e-04 (224s)
+03:47:59 | INFO | abl_concat_fusion.s1 | epoch 06 train_loss=0.2820 val_loss=1.4694 val_PR-AUC=0.3647 lr=5.0e-04 (225s)
+03:47:59 | INFO | abl_concat_fusion.s1 | early stopping at epoch 6 (best val PR-AUC 0.3958)
+04:01:15 | INFO | abl_concat_fusion.s1 | TEST PR-AUC=0.4227 ROC-AUC=0.9889 F1=0.4330 P=0.3677 R=0.5264 R@0.5%=0.6750 train=22.9min
