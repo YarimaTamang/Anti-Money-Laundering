@@ -12,7 +12,7 @@ This report lists what was actually executed and verified. Anything that was not
 | Profiling report and 7 figures | ✅ | ✅ `reports/profiling/` |
 | Preprocessing (account IDs, train-only FX rates, encodings), dev and full modes | ✅ | ✅ both modes run; tests |
 | Chronological 60/10/10/20 split snapped to timestamp changes | ✅ | ✅ test |
-| Causal index; edge (27) and account-state (11) features computed strictly before t | ✅ | ✅ 12 leakage tests against brute force |
+| Causal index; edge (27) and account-state (11) features computed strictly before t | ✅ | ✅ 11 leakage tests against brute force |
 | Sender and receiver history sequences | ✅ | ✅ tests |
 | Causal 2-hop temporal neighbourhood (TemporalGraphStore) | ✅ | ✅ tests, including the depth-pruning equivalence |
 | TRACE-X (EdgeTemporalGATConv, sender/receiver LSTMs, time encoding, temporal branch, gated fusion) | ✅ | ✅ shape and forward/backward tests; trained |
@@ -128,8 +128,9 @@ All explanations are for TRACE-X seed 0 on 10 test cases (5 TP, 2 FP, 2 FN, 1 TN
 
 ## F. Testing
 
-- `python -m pytest tests -q` → **42 executed, 42 passed, 0 failed** (18 Nov 2026).
-  - Leakage: 12 tests. Models: 21. Training: 3. Explainability: 6.
+- `python -m pytest tests -q` → **41 executed, 41 passed, 0 failed** (20 Nov 2026, after the clean-up).
+  - Leakage: 11 tests. Models: 21. Training: 3. Explainability: 6.
+  - On 18 Nov the suite had 42 tests (42 passed). The clean-up on 20 Nov removed two unused static-graph helpers (`build_static_graph`, `snapshot_before`), which were never used by the pipeline, together with the one test that covered only them.
 - Fixed in this session:
   - One stale assertion: the GNNExplainer fidelity test expected probability output, but the code now returns logit units.
   - One autograd warning in the trainer.
@@ -185,3 +186,25 @@ python scripts/uncertainty.py --exp tracex --seed 0
 python scripts/benchmark_efficiency.py
 streamlit run dashboard/app.py
 ```
+
+## Clean-up log (20 Nov 2026)
+
+The project was simplified without retraining. Every removal was checked for references in the code, dashboard, tests and documentation first.
+
+| Removed | Why it was safe |
+|---|---|
+| `src/models/{lstm,gru,gcn,graphsage,gat,gat_lstm}.py` | 8-line wrappers that only fixed one argument of the shared classes in `baselines.py`. `registry.py` now holds those settings directly. The architecture names are unchanged, so all 35 saved checkpoints still load with identical parameter counts, and the API returns the same score as before |
+| `src/sequences/sender_history.py`, `receiver_history.py` | Merged into one module, `src/sequences/histories.py`. Imports were updated in `src/data/pipeline.py` and `tests/test_leakage.py` |
+| `build_static_graph`, `snapshot_before` (in `src/graph/construction.py`) and their test | Never used by the pipeline, models, dashboard or API; only their own test called them |
+| `get()` in `src/utils/config.py` | Never called |
+| `captum` (requirements.txt) | Never imported; Integrated Gradients has its own implementation in `src/explainability/integrated_gradients.py` |
+| `docs/methodology.md` | Duplicated the README, which now contains all of its content (features, equations, training, explainability) |
+| `scripts/_bench.py`, `_bench2.py`, `_xtest.py` (local, git-ignored) | Early dev-mode timing and smoke scripts from 16 Nov, superseded by `scripts/benchmark_efficiency.py` and the test suite |
+
+**Checks after the clean-up:**
+
+- pytest: 41 passed.
+- All 35 full checkpoints load with matching parameter counts.
+- The API prediction for transaction 4723765 is unchanged (0.9999461145468307).
+- All 6 dashboard pages load without errors, and report generation works.
+- Every documented CLI option parses, and every local README link exists.

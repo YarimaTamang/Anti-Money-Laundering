@@ -6,10 +6,9 @@ import pandas as pd
 import torch
 
 from src.data.preprocessing import SPLIT_TEST, SPLIT_TRAIN, chronological_split
-from src.graph.construction import build_static_graph, snapshot_before, temporal_neighbors
+from src.graph.construction import temporal_neighbors
 from src.graph.features import EDGE_CONTINUOUS, NODE_FEATURES, node_states
-from src.sequences.receiver_history import receiver_history
-from src.sequences.sender_history import sender_history
+from src.sequences.histories import receiver_history, sender_history
 
 
 # ----------------------------------------------------------------- synthetic
@@ -79,14 +78,6 @@ def test_node_states_match_bruteforce(synth):
             assert st[e, side, fi["has_history"]] == float(len(act) > 0)
             if act:
                 assert np.isclose(st[e, side, fi["log_minutes_since_last"]], np.log1p(ts[e] - max(ts[act])))
-
-
-def test_snapshot_excludes_future_edges(synth):
-    g = build_static_graph(synth["src"], synth["dst"], synth["ts"], np.arange(synth["n"]))
-    for t in (0, 10, 25, 39):
-        snap = snapshot_before(g, t)
-        assert int((snap.edge_ts >= t).sum()) == 0
-        assert snap.edge_index.shape[1] == int((torch.as_tensor(synth["ts"]) < t).sum())
 
 
 def test_chronological_split_does_not_split_timestamps(synth):

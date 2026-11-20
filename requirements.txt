@@ -12,7 +12,6 @@ kagglehub==1.0.3
 psutil
 # Explainability / uncertainty
 shap==0.53.0
-captum==0.9.0
 networkx==3.6.1
 # Visualisation & dashboard
 matplotlib==3.11.2

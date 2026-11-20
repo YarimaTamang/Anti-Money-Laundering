@@ -4,7 +4,6 @@ from __future__ import annotations
 import copy
 import os
 from pathlib import Path
-from typing import Any
 
 import yaml
 
@@ -42,12 +41,3 @@ def processed_dir(data_cfg: dict, mode: str | None = None) -> Path:
     mode = mode or data_cfg["mode"]
     root = os.environ.get("TRACEX_DATA_DIR") or data_cfg["processed_dir"]
     return resolve_path(root) / mode
-
-
-def get(cfg: dict, dotted: str, default: Any = None) -> Any:
-    cur: Any = cfg
-    for part in dotted.split("."):
-        if not isinstance(cur, dict) or part not in cur:
-            return default
-        cur = cur[part]
-    return cur

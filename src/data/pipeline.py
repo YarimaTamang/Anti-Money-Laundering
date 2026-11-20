@@ -16,8 +16,7 @@ from src.data.preprocessing import SPLIT_TRAIN, preprocess
 from src.graph.construction import temporal_neighbors
 from src.graph.features import (EDGE_CONTINUOUS, NODE_CONTINUOUS, NODE_FEATURES, edge_feature_names,
                                 edge_features, fit_standardizer, node_states)
-from src.sequences.receiver_history import receiver_history
-from src.sequences.sender_history import sender_history
+from src.sequences.histories import receiver_history, sender_history
 from src.utils.config import load_yaml, processed_dir
 from src.utils.logging import get_logger
 
